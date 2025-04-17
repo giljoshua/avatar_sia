@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Light Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             background-color: #1a202c;
@@ -37,6 +38,16 @@
             background-color: #f56565;
             border-color: #f56565;
         }
+        .btn-pdf {
+            background-color: #ed8936;
+            border-color: #ed8936;
+            color: white;
+        }
+        .btn-pdf:hover {
+            background-color: #dd6b20;
+            border-color: #dd6b20;
+            color: white;
+        }
         .brightness-control {
             width: 100%;
         }
@@ -48,13 +59,46 @@
             color: #f56565;
             font-weight: bold;
         }
+        .form-control, .form-select {
+            background-color: #4a5568;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #4a5568;
+            border-color: #63b3ed;
+            color: #e2e8f0;
+            box-shadow: 0 0 0 0.25rem rgba(99, 179, 237, 0.25);
+        }
+        .pagination {
+            --bs-pagination-color: #e2e8f0;
+            --bs-pagination-bg: #2d3748;
+            --bs-pagination-border-color: #4a5568;
+            --bs-pagination-hover-color: #e2e8f0;
+            --bs-pagination-hover-bg: #4a5568;
+            --bs-pagination-hover-border-color: #4a5568;
+            --bs-pagination-focus-color: #e2e8f0;
+            --bs-pagination-focus-bg: #4a5568;
+            --bs-pagination-active-bg: #4299e1;
+            --bs-pagination-active-border-color: #4299e1;
+            --bs-pagination-disabled-color: #9fa6b2;
+            --bs-pagination-disabled-bg: #2d3748;
+            --bs-pagination-disabled-border-color: #4a5568;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-dark mb-4">
         <div class="container">
             <span class="navbar-brand mb-0 h1">Smart Light Dashboard</span>
-            <a href="{{ route('smart-lights.create') }}" class="btn btn-success btn-sm">Add New Light</a>
+            <div>
+                <a href="{{ route('smart-lights.create') }}" class="btn btn-success btn-sm me-2">
+                    <i class="fas fa-plus"></i> Add New Light
+                </a>
+                <a href="{{ route('smart-lights.pdf') }}" class="btn btn-pdf btn-sm" id="export-pdf">
+                    <i class="fas fa-file-pdf"></i> Export PDF
+                </a>
+            </div>
         </div>
     </nav>
 
@@ -67,6 +111,46 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
+
+                <!-- Search and filter section -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="{{ route('smart-lights.index') }}" method="GET" class="row g-3">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Search by name or location" 
+                                           name="search" value="{{ request('search') }}">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select name="status" class="form-select">
+                                    <option value="">-- Filter by Status --</option>
+                                    <option value="On" {{ request('status') == 'On' ? 'selected' : '' }}>On</option>
+                                    <option value="Off" {{ request('status') == 'Off' ? 'selected' : '' }}>Off</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select name="location" class="form-select">
+                                    <option value="">-- Filter by Location --</option>
+                                    @foreach($locations as $location)
+                                        <option value="{{ $location }}" {{ request('location') == $location ? 'selected' : '' }}>
+                                            {{ $location }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="d-flex">
+                                    <button type="submit" class="btn btn-primary me-2">Filter</button>
+                                    <a href="{{ route('smart-lights.index') }}" class="btn btn-secondary">Reset</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
                 <div class="card">
                     <div class="card-body">
@@ -140,12 +224,31 @@
                                 </tbody>
                             </table>
                         </div>
+                        
+                        <!-- Pagination Links -->
+                        <div class="d-flex justify-content-center mt-4">
+                            {{ $smartLights->withQueryString()->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <script>
+        document.getElementById('export-pdf').addEventListener('click', function(e) {
+            e.preventDefault();
+            let url = this.getAttribute('href');
+            
+            // Append current filter parameters to PDF URL
+            const searchParams = new URLSearchParams(window.location.search);
+            if (searchParams.toString()) {
+                url += '?' + searchParams.toString();
+            }
+            
+            window.location.href = url;
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

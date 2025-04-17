@@ -4,16 +4,44 @@ namespace App\Http\Controllers;
 
 use App\Models\SmartLight;
 use Illuminate\Http\Request;
+use PDF; // Add PDF facade
 
 class SmartLightController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $smartLights = SmartLight::all();
-        return view('smart_lights.index', compact('smartLights'));
+        $query = SmartLight::query();
+        
+        // Search filter implementation
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%")
+                  ->orWhere('status', 'like', "%{$search}%");
+            });
+        }
+        
+        // Filter by status if provided
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+        
+        // Filter by location if provided
+        if ($request->has('location') && $request->location != '') {
+            $query->where('location', 'like', "%{$request->location}%");
+        }
+        
+        // Pagination implementation (10 items per page)
+        $smartLights = $query->orderBy('id', 'desc')->paginate(10);
+        
+        // Get unique locations for the filter dropdown
+        $locations = SmartLight::distinct()->pluck('location');
+        
+        return view('smart_lights.index', compact('smartLights', 'locations'));
     }
 
     /**
@@ -110,5 +138,37 @@ class SmartLightController extends Controller
         
         return redirect()->route('smart-lights.index')
                         ->with('success', "Brightness of {$smartLight->name} adjusted successfully");
+    }
+
+    /**
+     * Generate PDF of smart lights data
+     */
+    public function generatePDF(Request $request)
+    {
+        $query = SmartLight::query();
+        
+        // Apply the same filters as in the index method
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%")
+                  ->orWhere('status', 'like', "%{$search}%");
+            });
+        }
+        
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+        
+        if ($request->has('location') && $request->location != '') {
+            $query->where('location', 'like', "%{$request->location}%");
+        }
+        
+        $smartLights = $query->orderBy('id', 'desc')->get();
+        
+        $pdf = PDF::loadView('smart_lights.pdf', compact('smartLights'));
+        
+        return $pdf->download('smart-lights-report.pdf');
     }
 }

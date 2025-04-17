@@ -15,3 +15,6 @@ Route::resource('smart-lights', SmartLightController::class);
 
 // Additional route for toggling light status
 Route::put('smart-lights/{smartLight}/toggle', [SmartLightController::class, 'toggleStatus'])->name('smart-lights.toggle');
+
+// Route for PDF generation
+Route::get('smart-lights-pdf', [SmartLightController::class, 'generatePDF'])->name('smart-lights.pdf');
