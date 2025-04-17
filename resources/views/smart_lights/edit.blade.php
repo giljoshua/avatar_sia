@@ -40,6 +40,9 @@
             background-color: #718096;
             border-color: #718096;
         }
+        .card-header h4 {
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
