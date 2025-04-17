@@ -252,19 +252,124 @@
             text-align: center;
             margin-top: 1rem;
         }
+
+        /* Authentication Menu Styles */
+        .auth-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .auth-dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--card-bg);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .auth-dropdown:hover .auth-dropdown-menu {
+            display: block;
+        }
+
+        .auth-dropdown-menu a, .auth-dropdown-menu form button {
+            color: var(--text-color);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            background: none;
+            border: none;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .auth-dropdown-menu a:hover, .auth-dropdown-menu form button:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .auth-divider {
+            height: 1px;
+            margin: 0.5rem 0;
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .auth-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .auth-user:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .auth-user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        .auth-user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auth-user-name {
+            font-weight: 500;
+        }
+
+        .auth-user-email {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
         <div class="dashboard-header">
             <h2>Smart Light Dashboard</h2>
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 align-items-center">
                 <a href="{{ route('smart-lights.create') }}" class="btn-action btn-add">
                     <i class="fas fa-plus"></i> Add New Light
                 </a>
                 <a href="{{ route('smart-lights.pdf') }}" class="btn-action btn-pdf" id="export-pdf">
                     <i class="fas fa-file-pdf"></i> Export PDF
                 </a>
+
+                <!-- Authentication -->
+                <div class="auth-dropdown ms-3">
+                    <div class="auth-user">
+                        <div class="auth-user-avatar">
+                            {{ substr(Auth::user()->name, 0, 1) }}
+                        </div>
+                        <div class="auth-user-info d-none d-md-flex">
+                            <span class="auth-user-name">{{ Auth::user()->name }}</span>
+                            <span class="auth-user-email">{{ Auth::user()->email }}</span>
+                        </div>
+                    </div>
+                    <div class="auth-dropdown-menu">
+                        <a href="{{ route('smart-lights.index') }}">Dashboard</a>
+                        <a href="{{ route('profile.edit') }}">Profile</a>
+                        <div class="auth-divider"></div>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit">Log Out</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 
