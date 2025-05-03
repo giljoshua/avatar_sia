@@ -353,7 +353,11 @@
                 <div class="auth-dropdown ms-3">
                     <div class="auth-user">
                         <div class="auth-user-avatar">
-                            {{ substr(Auth::user()->name, 0, 1) }}
+                            @if(Auth::user()->avatar)
+                                <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                            @else
+                                {{ substr(Auth::user()->name, 0, 1) }}
+                            @endif
                         </div>
                         <div class="auth-user-info d-none d-md-flex">
                             <span class="auth-user-name">{{ Auth::user()->name }}</span>
