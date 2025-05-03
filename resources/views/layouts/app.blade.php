@@ -31,6 +31,17 @@
             <main>
                 {{ $slot }}
             </main>
+
+            <!-- User Avatar Display -->
+            @auth
+                <div class="absolute top-4 right-4">
+                    @if(auth()->user()->avatar)
+                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}" class="w-10 h-10 rounded-full" alt="User Avatar">
+                    @else
+                       <img src="{{ asset('images/default-avatar.png') }}" class="w-10 h-10 rounded-full" alt="Default Avatar">
+                    @endif
+                </div>
+            @endauth
         </div>
     </body>
 </html>

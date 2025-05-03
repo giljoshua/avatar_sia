@@ -10,7 +10,7 @@ Route::get('/', function () {
     return redirect()->route('smart-lights.index');
 });
 
-// Redirects the default dashboard to smart lights
+// Redirect the default dashboard to smart lights
 Route::get('/dashboard', function () {
     return redirect()->route('smart-lights.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -19,7 +19,7 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     // Profile routes (from Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     // Smart Light routes (protected by authentication)
@@ -33,3 +33,4 @@ Route::middleware('auth')->group(function () {
 
 // Authentication routes
 require __DIR__.'/auth.php';
+
